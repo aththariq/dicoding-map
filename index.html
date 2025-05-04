@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Dicoding Story - Share your stories with Dicoding community"
+    />
+    <meta name="theme-color" content="#3A59D1" />
+    <title>Dicoding Story</title>
+
+    <!-- Favicon -->
+    <link
+      rel="shortcut icon"
+      href="./src/public/favicon.png"
+      type="image/x-icon"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="./src/styles/main.css" />
+
+    <!-- App manifest -->
+    <link rel="manifest" href="./manifest.json" />
+
+    <!-- Google Fonts -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    />
+  </head>
+  <body>
+    <a href="#mainContent" class="skip-link">Skip to content</a>
+
+    <header class="app-bar">
+      <div class="app-bar__menu">
+        <button id="hamburgerButton" aria-label="Menu toggle">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+      <div class="app-bar__brand">
+        <h1><i class="fa-solid fa-book-open"></i> Dicoding Story</h1>
+      </div>
+      <nav id="navigationDrawer" class="app-bar__navigation">
+        <ul>
+          <li>
+            <a href="#/home"><i class="fa-solid fa-home"></i> Home</a>
+          </li>
+          <li>
+            <a href="#/add-story"><i class="fa-solid fa-plus"></i> Add Story</a>
+          </li>
+          <li id="loginMenuItem">
+            <a href="#/login"><i class="fa-solid fa-sign-in-alt"></i> Login</a>
+          </li>
+          <li id="registerMenuItem">
+            <a href="#/register"
+              ><i class="fa-solid fa-user-plus"></i> Register</a
+            >
+          </li>
+          <li id="logoutMenuItem" class="hidden">
+            <a href="#" id="logoutButton"
+              ><i class="fa-solid fa-sign-out-alt"></i> Logout</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="mainContent" tabindex="0">
+      <!-- Content will be rendered here by JavaScript -->
+    </main>
+
+    <footer>
+      <p>&copy; <span id="year"></span> Dicoding Story</p>
+    </footer>
+
+    <!-- App Bundle -->
+    <script src="./src/scripts/index.js" type="module"></script>
+  </body>
+</html>

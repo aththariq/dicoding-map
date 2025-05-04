@@ -1,0 +1,17 @@
+{
+  "name": "Dicoding Story",
+  "short_name": "DStory",
+  "description": "Share your stories with Dicoding community",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#3A59D1",
+  "icons": [
+    {
+      "src": "/src/public/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

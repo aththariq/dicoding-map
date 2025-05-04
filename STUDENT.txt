@@ -1,0 +1,18 @@
+APP_URL=<url_aplikasi>
+MAP_SERVICE_API_KEY=<api_key>
+
+Dicoding Story Project
+===========================
+
+Web Services & Maps:
+- Leaflet - Using OpenStreetMap for base map (no API key required)
+- OpenStreetMap - Default map provider (no API key required)
+- ArcGIS - For satellite imagery (no API key required)
+- OpenTopoMap - For terrain map (no API key required)
+
+Web Push Notification:
+- VAPID Public Key: BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk
+
+Notes:
+- The map implementation uses freely available tile services that don't require API keys
+- If you need to use commercial map services in the future, add your API keys here
