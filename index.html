@@ -13,15 +13,26 @@
     <meta name="apple-mobile-web-app-title" content="Dicoding Story" />
     <title>Dicoding Story</title>
 
-    <!-- Favicon - fixed path -->
+    <!-- Favicon -->
     <link
       rel="shortcut icon"
-      href="./src/public/favicon.svg"
+      href="./src/public/favicon.ico"
+      type="image/x-icon"
+    />
+    <link
+      rel="icon"
       type="image/svg+xml"
+      href="./src/public/favicon.svg"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="./src/public/favicon-96x96.png"
     />
 
     <!-- Apple touch icon -->
-    <link rel="apple-touch-icon" href="./src/public/favicon.svg" />
+    <link rel="apple-touch-icon" href="./src/public/apple-touch-icon.png" />
 
     <!-- Font Awesome -->
     <link
@@ -50,6 +61,9 @@
 
     <!-- App manifest -->
     <link rel="manifest" href="./manifest.json" crossorigin="use-credentials" />
+    
+    <!-- Site webmanifest for browsers that don't support manifest.json -->
+    <link rel="manifest" href="./src/public/site.webmanifest" />
 
     <!-- Google Fonts -->
     <link
