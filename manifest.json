@@ -32,14 +32,24 @@
       "short_name": "Add Story",
       "description": "Create a new story post",
       "url": "./index.html#/add-story",
-      "icons": [{ "src": "./src/public/web-app-manifest-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./src/public/web-app-manifest-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
       "name": "View Favorites",
       "short_name": "Favorites",
       "description": "View your favorite stories",
       "url": "./index.html#/home",
-      "icons": [{ "src": "./src/public/web-app-manifest-192x192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "./src/public/web-app-manifest-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "screenshots": [

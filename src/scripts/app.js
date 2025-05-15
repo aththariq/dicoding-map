@@ -1,4 +1,4 @@
-import { DrawerInitiator, AuthHelper } from "./utils";
+import { DrawerInitiator, AuthHelper, InstallHelper } from "./utils";
 import { getActiveRoute } from "./routes/url-parser";
 import routes from "./routes/routes";
 
@@ -17,6 +17,11 @@ class App {
       button: this._drawerButton,
       drawer: this._navigationDrawer,
       content: this._content,
+    });
+
+    // Initialize PWA install banner
+    InstallHelper.init({
+      installContainer: document.getElementById("installBanner"),
     });
 
     // Set current year in footer

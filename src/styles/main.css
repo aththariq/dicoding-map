@@ -772,6 +772,157 @@ footer {
   color: #ff5252;
 }
 
+/* Install Banner */
+.install-banner-container {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 500px;
+  z-index: 999;
+  transition: all 0.3s ease;
+  animation: slideUpFade 0.5s ease forwards;
+}
+
+.install-banner-container.active {
+  display: block;
+}
+
+.install-banner {
+  background: var(--white-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.install-banner__content {
+  position: relative;
+  padding: 20px;
+}
+
+.install-banner__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.install-banner__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  margin-right: 16px;
+}
+
+.install-banner__app-info h3 {
+  margin: 0 0 4px;
+  color: var(--dark-color);
+  font-size: 1.2rem;
+}
+
+.install-banner__app-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.install-banner__screenshots {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  max-height: 160px;
+}
+
+.install-banner__screenshot {
+  height: 140px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.install-banner__features {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 16px;
+}
+
+.install-banner__feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.install-banner__feature i {
+  font-size: 1.2rem;
+  color: var(--primary-color);
+  margin-bottom: 4px;
+}
+
+.install-banner__feature span {
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.install-banner__button {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  font-weight: 600;
+  font-family: var(--font-family);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.install-banner__button i {
+  margin-right: 8px;
+}
+
+.install-banner__button:hover {
+  background-color: #2c4ab3;
+}
+
+.install-banner__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #999;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.install-banner__close:hover {
+  background: #eee;
+  color: var(--dark-color);
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 /* Media Queries for Responsive Design */
 @media screen and (min-width: 768px) {
   /* App Bar */
