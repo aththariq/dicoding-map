@@ -23,8 +23,8 @@ const appShellFiles = [
   "/src/scripts/index.js",
   "/src/styles/main.css",
   "/src/styles/styles.css",
-  "/src/public/favicon.png",
-  "/src/public/images/logo.png",
+  "/favicon.svg",
+  "/src/public/images/logo.svg",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
@@ -153,7 +153,7 @@ self.addEventListener("push", (event) => {
       title: "Dicoding Story",
       options: {
         body: "New update available",
-        icon: "/src/public/favicon.png",
+        icon: "/favicon.svg",
       },
     };
   }

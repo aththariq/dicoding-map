@@ -46,9 +46,17 @@ class HomePage {
   }
 
   async afterRender() {
+    console.log("HomePage:afterRender - Checking authentication");
     const isAuthenticated = this.checkAuthentication();
+    console.log(
+      "HomePage:afterRender - Authentication status:",
+      isAuthenticated
+    );
 
     if (!isAuthenticated) {
+      console.log(
+        "HomePage:afterRender - User not authenticated, showing login message"
+      );
       this._showAuthenticationRequired();
       return;
     }
