@@ -18,9 +18,24 @@ class HomePage {
     return `
       <section class="home-container">
         <h2 class="page-title"><i class="fa-solid fa-book-open"></i> Story Feed</h2>
+        
+        <div class="tab-container">
+          <button class="tab-button active" id="allStoriesTab">
+            <i class="fa-solid fa-globe"></i> All Stories
+          </button>
+          <button class="tab-button" id="favoritesTab">
+            <i class="fa-solid fa-heart"></i> Favorites
+          </button>
+        </div>
+        
         <div class="story-map-container">
           <div id="storyMap" class="story-map"></div>
         </div>
+        
+        <div id="offlineIndicator" class="offline-indicator hidden">
+          <i class="fa-solid fa-wifi-slash"></i> You are currently viewing offline content
+        </div>
+        
         <div class="story-list-container" id="storyList">
           <div class="loading-indicator">
             <i class="fa-solid fa-spinner fa-spin"></i> Loading stories...
@@ -38,12 +53,47 @@ class HomePage {
       return;
     }
 
+    // Setup tabs
+    this._setupTabs();
+
     try {
       await this._initializeMap();
       await this.onLoadStories({ withLocation: true });
+
+      // Update online/offline status
+      this._updateNetworkStatus();
+      window.addEventListener("online", () => this._updateNetworkStatus());
+      window.addEventListener("offline", () => this._updateNetworkStatus());
     } catch (error) {
       console.error("Error initializing home page:", error);
       this.renderError("Failed to load stories. Please try again later.");
+    }
+  }
+
+  _setupTabs() {
+    const allStoriesTab = document.getElementById("allStoriesTab");
+    const favoritesTab = document.getElementById("favoritesTab");
+
+    allStoriesTab.addEventListener("click", () => {
+      allStoriesTab.classList.add("active");
+      favoritesTab.classList.remove("active");
+      this.onLoadStories({ withLocation: true });
+    });
+
+    favoritesTab.addEventListener("click", () => {
+      favoritesTab.classList.add("active");
+      allStoriesTab.classList.remove("active");
+      this.onLoadFavorites();
+    });
+  }
+
+  _updateNetworkStatus() {
+    const offlineIndicator = document.getElementById("offlineIndicator");
+
+    if (navigator.onLine) {
+      offlineIndicator.classList.add("hidden");
+    } else {
+      offlineIndicator.classList.remove("hidden");
     }
   }
 
@@ -57,8 +107,9 @@ class HomePage {
     `;
   }
 
-  renderStories(stories) {
+  renderStories(stories, source = "api") {
     const storyListContainer = document.getElementById("storyList");
+    this.markersLayer.clearLayers();
 
     if (stories.length === 0) {
       storyListContainer.innerHTML = `
@@ -70,10 +121,20 @@ class HomePage {
       return;
     }
 
+    // Show offline indicator if data is from IndexedDB
+    const offlineIndicator = document.getElementById("offlineIndicator");
+    if (source === "indexeddb") {
+      offlineIndicator.classList.remove("hidden");
+    } else {
+      offlineIndicator.classList.add("hidden");
+    }
+
     // Render stories
     storyListContainer.innerHTML = "";
     stories.forEach((story) => {
-      this._addStoryMarker(story);
+      if (story.lat && story.lon) {
+        this._addStoryMarker(story);
+      }
 
       const storyElement = document.createElement("article");
       storyElement.classList.add("story-item");
@@ -103,14 +164,49 @@ class HomePage {
           `
               : ""
           }
-          <a href="#/detail/${story.id}" class="btn-read-more">
-            <i class="fa-solid fa-arrow-right"></i> Read More
-          </a>
+          <div class="story-actions">
+            <a href="#/detail/${story.id}" class="btn-read-more">
+              Read More <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <button class="btn-favorite" data-id="${story.id}">
+              <i class="fa-${
+                this._isFavorite(story.id) ? "solid" : "regular"
+              } fa-heart"></i>
+            </button>
+          </div>
         </div>
       `;
 
       storyListContainer.appendChild(storyElement);
+
+      // Add favorite button event listener
+      const favoriteButton = storyElement.querySelector(".btn-favorite");
+      favoriteButton.addEventListener("click", (event) => {
+        this._handleFavoriteClick(event, story);
+      });
     });
+  }
+
+  async _handleFavoriteClick(event, story) {
+    const button = event.currentTarget;
+    const icon = button.querySelector("i");
+    const isFavorite = icon.classList.contains("fa-solid");
+
+    if (isFavorite) {
+      // Remove from favorites
+      await this.onRemoveFromFavorites(story.id);
+      icon.classList.replace("fa-solid", "fa-regular");
+    } else {
+      // Add to favorites
+      await this.onAddToFavorites(story);
+      icon.classList.replace("fa-regular", "fa-solid");
+    }
+  }
+
+  _isFavorite(storyId) {
+    // This will be populated from the presenter
+    if (!this.favoriteIds) return false;
+    return this.favoriteIds.includes(storyId);
   }
 
   renderError(message) {

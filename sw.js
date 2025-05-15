@@ -1,108 +1,145 @@
-/* Service Worker for Dicoding Story App */
-const CACHE_NAME = "dicoding-story-cache-v1";
-const urlsToCache = [
+// Service Worker with Workbox
+importScripts(
+  "https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js"
+);
+
+// Workbox configuration
+workbox.setConfig({
+  debug: false,
+});
+
+const { strategies, routing, precaching, expiration, cacheableResponse } =
+  workbox;
+
+// Cache name
+const CACHE_NAME = "dicoding-story-v2";
+
+// Precached assets - critical for App Shell
+const appShellFiles = [
   "/",
   "/index.html",
-  "/src/styles/main.css",
-  "/src/styles/styles.css",
+  "/manifest.json",
   "/src/scripts/app.js",
   "/src/scripts/index.js",
-  "/manifest.json",
+  "/src/styles/main.css",
+  "/src/styles/styles.css",
+  "/src/public/favicon.png",
+  "/src/public/images/logo.png",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
   "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap",
 ];
 
-// Install event - cache assets
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => {
-        console.log("Cache opened");
-        return cache.addAll(urlsToCache);
-      })
-      .then(() => self.skipWaiting())
-  );
-});
+// Configure precaching
+precaching.precacheAndRoute([
+  ...appShellFiles.map((url) => ({
+    url,
+    revision: CACHE_NAME,
+  })),
+]);
 
-// Activate event - clean old caches
-self.addEventListener("activate", (event) => {
-  const cacheWhitelist = [CACHE_NAME];
+// Cache CSS, JS, and Web Worker files with a Stale While Revalidate strategy
+routing.registerRoute(
+  ({ request }) =>
+    request.destination === "style" ||
+    request.destination === "script" ||
+    request.destination === "worker",
+  new strategies.StaleWhileRevalidate({
+    cacheName: "assets-cache",
+    plugins: [
+      new expiration.ExpirationPlugin({
+        maxEntries: 60,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+      }),
+    ],
+  })
+);
 
-  event.waitUntil(
-    caches
-      .keys()
-      .then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => {
-            if (!cacheWhitelist.includes(cacheName)) {
-              console.log("Deleting old cache:", cacheName);
-              return caches.delete(cacheName);
-            }
-            return null;
-          })
-        );
-      })
-      .then(() => self.clients.claim())
-  );
-});
+// Cache image files with a Cache First strategy
+routing.registerRoute(
+  ({ request }) => request.destination === "image",
+  new strategies.CacheFirst({
+    cacheName: "images-cache",
+    plugins: [
+      new expiration.ExpirationPlugin({
+        maxEntries: 60,
+        maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+      }),
+    ],
+  })
+);
 
-// Fetch event - serve from cache first, then network
-self.addEventListener("fetch", (event) => {
-  // Skip cross-origin requests
-  if (
-    !event.request.url.startsWith(self.location.origin) &&
-    !event.request.url.includes("unpkg.com") &&
-    !event.request.url.includes("cdnjs.cloudflare.com")
-  ) {
-    return;
+// Cache Google Fonts with a Stale While Revalidate strategy
+routing.registerRoute(
+  ({ url }) =>
+    url.origin === "https://fonts.googleapis.com" ||
+    url.origin === "https://fonts.gstatic.com",
+  new strategies.StaleWhileRevalidate({
+    cacheName: "google-fonts",
+    plugins: [
+      new expiration.ExpirationPlugin({
+        maxEntries: 30,
+      }),
+    ],
+  })
+);
+
+// Cache Leaflet map tiles with a Cache First strategy
+routing.registerRoute(
+  ({ url }) =>
+    url.origin === "https://unpkg.com" ||
+    url.href.includes("tile.openstreetmap.org") ||
+    url.href.includes("server.arcgisonline.com") ||
+    url.href.includes("tile.opentopomap.org"),
+  new strategies.CacheFirst({
+    cacheName: "map-cache",
+    plugins: [
+      new cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new expiration.ExpirationPlugin({
+        maxEntries: 100,
+        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+      }),
+    ],
+  })
+);
+
+// Network First strategy for API calls - attempt network first, fall back to cache
+routing.registerRoute(
+  ({ url }) => url.href.includes("story-api.dicoding.dev"),
+  new strategies.NetworkFirst({
+    cacheName: "api-cache",
+    plugins: [
+      new expiration.ExpirationPlugin({
+        maxEntries: 100,
+        maxAgeSeconds: 24 * 60 * 60, // 24 hours
+      }),
+    ],
+    networkTimeoutSeconds: 3, // Fallback to cache after 3 seconds if network is slow
+  })
+);
+
+// Cache pages for offline access using Network First
+routing.registerRoute(
+  ({ request }) => request.mode === "navigate",
+  new strategies.NetworkFirst({
+    cacheName: "pages-cache",
+    plugins: [
+      new expiration.ExpirationPlugin({
+        maxEntries: 50,
+      }),
+    ],
+  })
+);
+
+// Offline fallback - if a navigation request fails, show the offline page
+routing.setCatchHandler(({ event }) => {
+  if (event.request.destination === "document") {
+    return caches.match("/index.html");
   }
-
-  // For API requests, use network first strategy
-  if (event.request.url.includes("story-api.dicoding.dev")) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response;
-      }
-
-      return fetch(event.request)
-        .then((fetchResponse) => {
-          // Don't cache if not a valid response
-          if (
-            !fetchResponse ||
-            fetchResponse.status !== 200 ||
-            fetchResponse.type !== "basic"
-          ) {
-            return fetchResponse;
-          }
-
-          // Clone the response
-          const responseToCache = fetchResponse.clone();
-
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-
-          return fetchResponse;
-        })
-        .catch(() => {
-          // Return a fallback for html requests
-          if (event.request.headers.get("accept").includes("text/html")) {
-            return caches.match("/index.html");
-          }
-          return new Response("Network error happened", {
-            status: 408,
-            headers: { "Content-Type": "text/plain" },
-          });
-        });
-    })
-  );
+  return Response.error();
 });
 
 // Handle push notifications
@@ -116,7 +153,7 @@ self.addEventListener("push", (event) => {
       title: "Dicoding Story",
       options: {
         body: "New update available",
-        icon: "/src/public/images/logo.png",
+        icon: "/src/public/favicon.png",
       },
     };
   }
@@ -147,4 +184,14 @@ self.addEventListener("notificationclick", (event) => {
       return null;
     })
   );
+});
+
+// Skip waiting to make updates active immediately
+self.addEventListener("install", (event) => {
+  self.skipWaiting();
+});
+
+// Claim clients to update already open pages
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim());
 });

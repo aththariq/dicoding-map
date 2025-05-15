@@ -10,5 +10,19 @@
   },
   "devDependencies": {
     "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "@types/workbox-cacheable-response": "^4.3.1",
+    "@types/workbox-expiration": "^4.3.1",
+    "@types/workbox-precaching": "^4.3.1",
+    "@types/workbox-routing": "^4.3.1",
+    "@types/workbox-strategies": "^4.3.1",
+    "@types/workbox-window": "^4.3.4",
+    "workbox-cacheable-response": "^7.3.0",
+    "workbox-expiration": "^7.3.0",
+    "workbox-precaching": "^7.3.0",
+    "workbox-routing": "^7.3.0",
+    "workbox-strategies": "^7.3.0",
+    "workbox-window": "^7.3.0"
   }
 }

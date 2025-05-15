@@ -698,6 +698,80 @@ footer {
   display: none !important;
 }
 
+/* Tab Container */
+.tab-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tab-button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--radius);
+  background-color: var(--white-color);
+  color: var(--dark-color);
+  font-family: var(--font-family);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+
+.tab-button i {
+  margin-right: 6px;
+}
+
+.tab-button.active {
+  background-color: var(--primary-color);
+  color: var(--white-color);
+}
+
+.tab-button:hover:not(.active) {
+  background-color: var(--light-color);
+}
+
+/* Offline Indicator */
+.offline-indicator {
+  background-color: #ff9800;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  margin-bottom: 16px;
+  border-radius: var(--radius);
+  font-weight: 500;
+}
+
+.offline-indicator i {
+  margin-right: 8px;
+}
+
+/* Story Actions */
+.story-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.btn-favorite {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.3s ease;
+}
+
+.btn-favorite:hover {
+  color: #ff5252;
+}
+
+.btn-favorite i.fa-solid {
+  color: #ff5252;
+}
+
 /* Media Queries for Responsive Design */
 @media screen and (min-width: 768px) {
   /* App Bar */
