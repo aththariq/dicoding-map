@@ -8,6 +8,9 @@
       content="Dicoding Story - Share your stories with Dicoding community"
     />
     <meta name="theme-color" content="#3A59D1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Dicoding Story" />
     <title>Dicoding Story</title>
 
     <!-- Favicon - fixed path -->
@@ -16,6 +19,9 @@
       href="./src/public/favicon.svg"
       type="image/svg+xml"
     />
+
+    <!-- Apple touch icon -->
+    <link rel="apple-touch-icon" href="./src/public/favicon.svg" />
 
     <!-- Font Awesome -->
     <link
@@ -43,7 +49,7 @@
     <link rel="stylesheet" href="./src/styles/main.css" type="text/css" />
 
     <!-- App manifest -->
-    <link rel="manifest" href="./manifest.json" />
+    <link rel="manifest" href="./manifest.json" crossorigin="use-credentials" />
 
     <!-- Google Fonts -->
     <link
