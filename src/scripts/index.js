@@ -1,7 +1,4 @@
-// CSS imports
-import "../styles/main.css";
-import "../styles/styles.css";
-
+// Import App
 import App from "./app";
 
 document.addEventListener("DOMContentLoaded", async () => {
