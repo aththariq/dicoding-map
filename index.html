@@ -10,11 +10,11 @@
     <meta name="theme-color" content="#3A59D1" />
     <title>Dicoding Story</title>
 
-    <!-- Favicon -->
+    <!-- Favicon - fixed path -->
     <link
       rel="shortcut icon"
-      href="./src/public/favicon.png"
-      type="image/x-icon"
+      href="./src/public/favicon.svg"
+      type="image/svg+xml"
     />
 
     <!-- Font Awesome -->
@@ -38,8 +38,9 @@
       crossorigin=""
     ></script>
 
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="./src/styles/main.css" />
+    <!-- CSS Files - explicit type to avoid MIME type issues -->
+    <link rel="stylesheet" href="./src/styles/styles.css" type="text/css" />
+    <link rel="stylesheet" href="./src/styles/main.css" type="text/css" />
 
     <!-- App manifest -->
     <link rel="manifest" href="./manifest.json" />

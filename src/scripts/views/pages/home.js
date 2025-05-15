@@ -12,6 +12,18 @@ class HomePage {
       storyModel: this._storyModel,
       userModel: this._userModel,
     });
+    this.favoriteIds = [];
+  }
+
+  // Add the missing checkAuthentication method
+  checkAuthentication() {
+    try {
+      const token = localStorage.getItem("authToken");
+      return !!token; // Return true if token exists
+    } catch (error) {
+      console.error("Error checking authentication", error);
+      return false;
+    }
   }
 
   async render() {

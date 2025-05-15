@@ -8,7 +8,7 @@
   "theme_color": "#3A59D1",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "./src/public/favicon.svg",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
@@ -20,26 +20,26 @@
       "short_name": "Add Story",
       "description": "Create a new story post",
       "url": "/index.html#/add-story",
-      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "./src/public/favicon.svg", "sizes": "192x192" }]
     },
     {
       "name": "View Favorites",
       "short_name": "Favorites",
       "description": "View your favorite stories",
       "url": "/index.html#/home",
-      "icons": [{ "src": "/favicon.svg", "sizes": "192x192" }]
+      "icons": [{ "src": "./src/public/favicon.svg", "sizes": "192x192" }]
     }
   ],
   "screenshots": [
     {
-      "src": "/src/public/images/screenshot-desktop.png",
+      "src": "./src/public/screenshot-1.png",
       "sizes": "1280x800",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Homescreen of Dicoding Story App"
     },
     {
-      "src": "/src/public/images/screenshot-mobile.png",
+      "src": "./src/public/screenshot-2.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow",
