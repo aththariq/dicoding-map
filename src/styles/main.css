@@ -781,13 +781,11 @@ footer {
   transform: translateX(-50%);
   width: 90%;
   max-width: 500px;
-  z-index: 999;
-  transition: all 0.3s ease;
-  animation: slideUpFade 0.5s ease forwards;
+  z-index: 9999;
 }
 
 .install-banner-container.active {
-  display: block;
+  display: block !important;
 }
 
 .install-banner {
@@ -795,6 +793,7 @@ footer {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
   overflow: hidden;
+  animation: slideUpFade 0.5s ease forwards;
 }
 
 .install-banner__content {
@@ -915,11 +914,11 @@ footer {
 @keyframes slideUpFade {
   from {
     opacity: 0;
-    transform: translate(-50%, 20px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
 

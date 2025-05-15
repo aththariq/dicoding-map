@@ -13,16 +13,38 @@ const InstallHelper = {
   init({ installContainer }) {
     this.installContainer = installContainer;
 
+    if (!installContainer) {
+      console.error(
+        "Install container element not found. Make sure the element exists in the DOM."
+      );
+      return;
+    }
+
+    console.log("InstallHelper initialized with container:", installContainer);
+
+    // Check if the app is already installed
+    if (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true
+    ) {
+      console.log("App is already installed, not showing install prompt");
+      return;
+    }
+
     // Capture the beforeinstallprompt event
     window.addEventListener("beforeinstallprompt", (e) => {
       // Prevent default browser install prompt
       e.preventDefault();
+      console.log("beforeinstallprompt event was fired and prevented");
 
       // Store the event for later use
       this.deferredPrompt = e;
 
-      // Show our custom install UI
-      this.showInstallPromotion();
+      // Only show if user hasn't dismissed recently
+      if (this.shouldShowInstallBanner()) {
+        // Show our custom install UI
+        this.showInstallPromotion();
+      }
     });
 
     // Hide install banner when app is installed
@@ -30,11 +52,28 @@ const InstallHelper = {
       console.log("App was installed");
       this.hideInstallPromotion();
     });
+
+    // For testing purposes - show banner after a short delay
+    // This helps us confirm the UI is working correctly
+    setTimeout(() => {
+      if (
+        !this.deferredPrompt &&
+        !window.matchMedia("(display-mode: standalone)").matches
+      ) {
+        console.log("Showing test banner after timeout");
+        this.showInstallPromotion(true);
+      }
+    }, 5000);
   },
 
   // Create and show a custom installation banner
-  showInstallPromotion() {
-    if (!this.installContainer) return;
+  showInstallPromotion(isTest = false) {
+    if (!this.installContainer) {
+      console.error("Cannot show install promotion: container is null");
+      return;
+    }
+
+    console.log("Showing install promotion banner");
 
     // Clear any existing content
     this.installContainer.innerHTML = "";
@@ -91,6 +130,13 @@ const InstallHelper = {
     const closeButton = installBanner.querySelector(".install-banner__close");
 
     this.installButton.addEventListener("click", () => {
+      if (isTest && !this.deferredPrompt) {
+        alert(
+          "This is a test banner. In a real scenario, the app installation would start now."
+        );
+        this.hideInstallPromotion();
+        return;
+      }
       this.installApp();
     });
 
@@ -110,7 +156,10 @@ const InstallHelper = {
 
   // Trigger the installation flow
   async installApp() {
-    if (!this.deferredPrompt) return;
+    if (!this.deferredPrompt) {
+      console.log("No installation prompt available");
+      return;
+    }
 
     // Show the browser install prompt
     this.deferredPrompt.prompt();
@@ -134,6 +183,11 @@ const InstallHelper = {
     // Don't show for 3 days after dismissal
     const threeDays = 3 * 24 * 60 * 60 * 1000;
     return Date.now() - parseInt(lastDismissed) > threeDays;
+  },
+
+  // Method for manually triggering the banner (for debugging)
+  debugShowBanner() {
+    this.showInstallPromotion(true);
   },
 };
 
