@@ -128,15 +128,7 @@ const InstallHelper = {
 
     if (this.installButton) {
       this.installButton.addEventListener("click", () => {
-        if (
-          (!this.deferredPrompt && !this.isDebugMode) ||
-          (this.isDebugMode &&
-            !window.matchMedia("(display-mode: standalone)").matches)
-        ) {
-          // If we're testing and there's no prompt
-          console.log("Install button clicked - starting installation");
-          this.installApp();
-        }
+        this.installApp();
       });
     }
 
