@@ -113,81 +113,34 @@ const InstallHelper = {
 
     console.log("Showing install promotion banner");
 
-    // Clear any existing content
-    this.installContainer.innerHTML = "";
-
-    // Create the install banner with app info
-    const installBanner = document.createElement("div");
-    installBanner.className = "install-banner";
-    installBanner.innerHTML = `
-      <div class="install-banner__content">
-        <div class="install-banner__header">
-          <img src="./src/public/web-app-manifest-192x192.png" alt="App Icon" class="install-banner__icon">
-          <div class="install-banner__app-info">
-            <h3>Dicoding Story</h3>
-            <p>Share your stories with Dicoding community</p>
-          </div>
-        </div>
-        
-        <div class="install-banner__screenshots">
-          <img src="./src/public/screenshot-1.png" alt="App Screenshot Desktop" class="install-banner__screenshot">
-          <img src="./src/public/screenshot-2.png" alt="App Screenshot Mobile" class="install-banner__screenshot">
-        </div>
-        
-        <div class="install-banner__features">
-          <div class="install-banner__feature">
-            <i class="fa-solid fa-wifi-slash"></i>
-            <span>Works offline</span>
-          </div>
-          <div class="install-banner__feature">
-            <i class="fa-solid fa-bolt"></i>
-            <span>Fast loading</span>
-          </div>
-          <div class="install-banner__feature">
-            <i class="fa-solid fa-bell"></i>
-            <span>Get notifications</span>
-          </div>
-          <div class="install-banner__feature">
-            <i class="fa-solid fa-mobile-screen"></i>
-            <span>Home screen access</span>
-          </div>
-        </div>
-        
-        <button class="install-banner__button">
-          <i class="fa-solid fa-download"></i> Install App
-        </button>
-        
-        <button class="install-banner__close">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-    `;
-
-    // Add to container
-    this.installContainer.appendChild(installBanner);
+    // Add active class to show the banner with animation
     this.installContainer.classList.add("active");
 
     // Setup event handlers
-    this.installButton = installBanner.querySelector(".install-banner__button");
-    const closeButton = installBanner.querySelector(".install-banner__close");
+    this.installButton = document.getElementById("installButton");
+    const closeButton = document.getElementById("closeInstallBanner");
 
-    this.installButton.addEventListener("click", () => {
-      if (isTest && !this.deferredPrompt) {
-        alert(
-          "This is a test banner. In a real scenario, the app installation would start now."
-        );
+    if (this.installButton) {
+      this.installButton.addEventListener("click", () => {
+        if (isTest && !this.deferredPrompt) {
+          alert(
+            "This is a test banner. In a real scenario, the app installation would start now."
+          );
+          this.hideInstallPromotion();
+          return;
+        }
+        this.installApp();
+      });
+    }
+
+    if (closeButton) {
+      closeButton.addEventListener("click", () => {
         this.hideInstallPromotion();
-        return;
-      }
-      this.installApp();
-    });
 
-    closeButton.addEventListener("click", () => {
-      this.hideInstallPromotion();
-
-      // Store that user dismissed the prompt
-      localStorage.setItem("installPromptDismissed", Date.now());
-    });
+        // Store that user dismissed the prompt
+        localStorage.setItem("installPromptDismissed", Date.now());
+      });
+    }
   },
 
   // Hide the installation banner

@@ -80,9 +80,10 @@
       href="./src/styles/data-manager.css"
       type="text/css"
     />
+    <link rel="stylesheet" href="./src/styles/install.css" type="text/css" />
 
     <!-- App manifest -->
-    <link rel="manifest" href="./manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
 
     <!-- Google Fonts -->
     <link
@@ -94,7 +95,29 @@
     <a href="#mainContent" class="skip-link">Skip to content</a>
 
     <!-- Install Banner Container -->
-    <div id="installBanner" class="install-banner-container"></div>
+    <div id="installBanner" class="install-banner-container">
+      <div class="install-banner">
+        <div class="install-banner-info">
+          <img
+            src="/logoipsum-144x144.png"
+            alt="Dicoding Story app icon"
+            class="install-banner-icon"
+          />
+          <div class="install-banner-text">
+            <h3 class="install-banner-title">Install Dicoding Story</h3>
+            <p class="install-banner-description">
+              Add to your home screen for easy access
+            </p>
+          </div>
+        </div>
+        <div class="install-banner-buttons">
+          <button id="installButton" class="install-button">Install</button>
+          <button id="closeInstallBanner" class="install-banner-close">
+            Not now
+          </button>
+        </div>
+      </div>
+    </div>
 
     <header class="app-bar">
       <div class="app-bar__menu">

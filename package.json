@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && npm run copy-public",
+    "preview": "vite preview",
+    "copy-public": "cp -r src/public/*.png dist/ && cp -r src/public/*.svg dist/ && cp -r src/public/*.ico dist/"
   },
   "devDependencies": {
     "vite": "^6.3.5"
