@@ -36,16 +36,43 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
+.notification-button.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.notification-button.loading::after {
+  content: "";
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  top: calc(50% - 0.5em);
+  right: 10px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: white;
+  animation: rotate 0.8s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* Media Query for mobile */
 @media screen and (max-width: 767px) {
   .notification-button span {
     display: none;
   }
-  
+
   .notification-button i {
     margin-right: 0;
   }
-  
+
   .notification-button {
     padding: 8px;
   }

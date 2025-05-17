@@ -1,4 +1,9 @@
-import { DrawerInitiator, AuthHelper, InstallHelper, NotificationButton } from "./utils";
+import {
+  DrawerInitiator,
+  AuthHelper,
+  InstallHelper,
+  NotificationButton,
+} from "./utils";
 import { getActiveRoute } from "./routes/url-parser";
 import routes from "./routes/routes";
 
@@ -25,7 +30,8 @@ class App {
     });
 
     // Initialize notification button
-    const notificationButtonContainer = document.getElementById("notificationButton");
+    const notificationButtonContainer =
+      document.getElementById("notificationButton");
     if (notificationButtonContainer) {
       NotificationButton.init({
         container: notificationButtonContainer,

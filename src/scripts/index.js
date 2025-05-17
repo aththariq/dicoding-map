@@ -1,5 +1,6 @@
 // Import App
 import App from "./app";
+import ToastInitiator from "./utils/toast-initiator";
 
 // Register Service Worker
 if ("serviceWorker" in navigator) {
@@ -16,6 +17,9 @@ if ("serviceWorker" in navigator) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // Initialize Toast
+  ToastInitiator.init();
+
   const app = new App({
     content: document.querySelector("#mainContent"),
     drawerButton: document.querySelector("#hamburgerButton"),

@@ -5,6 +5,7 @@ import NotificationButton from "./notification-button";
 import IdbHelper from "./idb-helper";
 import InstallHelper from "./install-helper";
 import DataManager from "./data-manager";
+import ToastInitiator from "./toast-initiator";
 
 export function showFormattedDate(date, locale = "en-US", options = {}) {
   return new Date(date).toLocaleDateString(locale, {
@@ -27,4 +28,5 @@ export {
   IdbHelper,
   InstallHelper,
   DataManager,
+  ToastInitiator,
 };

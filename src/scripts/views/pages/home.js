@@ -80,7 +80,7 @@ class HomePage {
 
     // Initialize data manager
     DataManager.init({
-      container: document.getElementById('dataManager'),
+      container: document.getElementById("dataManager"),
     });
 
     try {
@@ -91,9 +91,9 @@ class HomePage {
       this._updateNetworkStatus();
       window.addEventListener("online", () => this._updateNetworkStatus());
       window.addEventListener("offline", () => this._updateNetworkStatus());
-      
+
       // Setup data refresh event listener
-      document.addEventListener('refresh-stories', () => {
+      document.addEventListener("refresh-stories", () => {
         this.onLoadStories({ withLocation: true });
       });
     } catch (error) {

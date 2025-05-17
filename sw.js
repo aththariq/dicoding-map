@@ -24,6 +24,7 @@ const appShellFiles = [
   "./src/styles/main.css",
   "./src/styles/styles.css",
   "./src/styles/notification.css",
+  "./src/styles/toast.css",
   "./src/styles/data-manager.css",
   "./src/public/favicon.svg",
   "./src/public/favicon.ico",
@@ -159,36 +160,65 @@ self.addEventListener("push", (event) => {
   try {
     notificationData = event.data.json();
   } catch (e) {
+    // Fallback for non-JSON data
+    const text = event.data ? event.data.text() : "No payload";
     notificationData = {
       title: "Dicoding Story",
       options: {
-        body: "New update available",
+        body: text || "New update available",
         icon: "./src/public/favicon.svg",
         badge: "./src/public/web-app-manifest-192x192.png",
         vibrate: [100, 50, 100],
         data: {
-          url: self.location.origin
-        }
+          dateOfArrival: Date.now(),
+          url: self.location.origin,
+        },
+        actions: [
+          {
+            action: "open",
+            title: "View",
+          },
+          {
+            action: "close",
+            title: "Dismiss",
+          },
+        ],
       },
     };
   }
 
   const { title, options } = notificationData;
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    self.registration
+      .showNotification(title, options)
+      .then(() => self.registration.getNotifications())
+      .then((notifications) => {
+        // Optional: manage notifications, e.g., close old ones
+        console.log("Active notifications:", notifications.length);
+      })
+  );
 });
 
 // Handle notification click
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
-  const urlToOpen = event.notification.data?.url || '/';
+  // Get the action and URL
+  const action = event.action;
+  const urlToOpen = event.notification.data?.url || "/";
 
+  // If the action is close, just close the notification
+  if (action === "close") {
+    return;
+  }
+
+  // For other actions (default action or 'open' action)
   event.waitUntil(
     clients.matchAll({ type: "window" }).then((clientList) => {
       // If a window client is already open, focus it
       for (const client of clientList) {
-        if (client.url.includes(urlToOpen) && "focus" in client) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
           return client.focus();
         }
       }

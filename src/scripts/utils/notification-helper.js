@@ -2,42 +2,97 @@ import ApiService from "../data/api-service";
 import CONFIG from "../config";
 
 const NotificationHelper = {
+  isNotificationAvailable() {
+    return "Notification" in window;
+  },
+
+  isNotificationGranted() {
+    return Notification.permission === "granted";
+  },
+
   async requestPermission() {
-    if ("Notification" in window) {
-      const result = await Notification.requestPermission();
-      if (result === "denied") {
-        console.warn("Notification permission denied");
-        return false;
-      }
-      if (result === "default") {
-        console.warn("Notification permission prompt closed");
-        return false;
-      }
+    if (!this.isNotificationAvailable()) {
+      console.error("Notification API unsupported.");
+      return false;
+    }
+
+    if (this.isNotificationGranted()) {
       return true;
     }
-    return false;
+
+    const result = await Notification.requestPermission();
+    if (result === "denied") {
+      console.warn("Notification permission denied");
+      return false;
+    }
+    if (result === "default") {
+      console.warn("Notification permission prompt closed");
+      return false;
+    }
+    return true;
+  },
+
+  isServiceWorkerAvailable() {
+    return "serviceWorker" in navigator;
   },
 
   async registerServiceWorker() {
-    if ("serviceWorker" in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.register("/sw.js");
-        return registration;
-      } catch (error) {
-        console.error("Service worker registration failed:", error);
-        return null;
-      }
+    if (!this.isServiceWorkerAvailable()) {
+      console.error("Service Worker API unsupported");
+      return null;
     }
-    return null;
+
+    try {
+      const registration = await navigator.serviceWorker.register("/sw.js");
+      console.log("Service worker successfully registered", registration);
+      return registration;
+    } catch (error) {
+      console.error("Service worker registration failed:", error);
+      return null;
+    }
+  },
+
+  async getRegisteredServiceWorker() {
+    if (!this.isServiceWorkerAvailable()) {
+      console.error("Service Worker API unsupported");
+      return null;
+    }
+
+    return navigator.serviceWorker.ready;
+  },
+
+  async hasActiveSubscription() {
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) return false;
+
+      const subscription = await registration.pushManager.getSubscription();
+      return !!subscription;
+    } catch (error) {
+      console.error("Error checking push notification status:", error);
+      return false;
+    }
   },
 
   async subscribeToPushNotification() {
     try {
       const serviceWorkerRegistration = await this.registerServiceWorker();
-      if (!serviceWorkerRegistration) return;
+      if (!serviceWorkerRegistration) {
+        throw new Error("Service worker registration failed");
+      }
 
       const hasPermission = await this.requestPermission();
-      if (!hasPermission) return;
+      if (!hasPermission) {
+        throw new Error("Notification permission denied");
+      }
+
+      // Check if already subscribed
+      const existingSubscription =
+        await serviceWorkerRegistration.pushManager.getSubscription();
+      if (existingSubscription) {
+        // Already subscribed, return the existing subscription
+        return existingSubscription;
+      }
 
       const subscription =
         await serviceWorkerRegistration.pushManager.subscribe({
@@ -47,28 +102,32 @@ const NotificationHelper = {
           ),
         });
 
+      const p256dh = btoa(
+        String.fromCharCode.apply(
+          null,
+          new Uint8Array(subscription.getKey("p256dh"))
+        )
+      );
+
+      const auth = btoa(
+        String.fromCharCode.apply(
+          null,
+          new Uint8Array(subscription.getKey("auth"))
+        )
+      );
+
       await ApiService.subscribeToPushNotification({
         endpoint: subscription.endpoint,
         keys: {
-          p256dh: btoa(
-            String.fromCharCode.apply(
-              null,
-              new Uint8Array(subscription.getKey("p256dh"))
-            )
-          ),
-          auth: btoa(
-            String.fromCharCode.apply(
-              null,
-              new Uint8Array(subscription.getKey("auth"))
-            )
-          ),
+          p256dh,
+          auth,
         },
       });
 
       return subscription;
     } catch (error) {
       console.error("Error subscribing to notifications:", error);
-      return null;
+      throw error; // Rethrow to handle in the UI
     }
   },
 
@@ -90,6 +149,50 @@ const NotificationHelper = {
       console.error("Error unsubscribing from notifications:", error);
       return false;
     }
+  },
+
+  // Method to show a test notification for debugging purposes
+  async showTestNotification() {
+    if (!this.isNotificationAvailable()) {
+      console.error("Notification API unsupported.");
+      return false;
+    }
+
+    if (!this.isNotificationGranted()) {
+      const permission = await this.requestPermission();
+      if (!permission) {
+        console.warn("Notification permission not granted");
+        return false;
+      }
+    }
+
+    const serviceWorkerRegistration = await this.getRegisteredServiceWorker();
+    if (!serviceWorkerRegistration) {
+      console.error("No active service worker found");
+      return false;
+    }
+
+    serviceWorkerRegistration.showNotification("Test Notification", {
+      body: "This is a test notification from Dicoding Story",
+      icon: "./src/public/favicon.svg",
+      badge: "./src/public/web-app-manifest-192x192.png",
+      vibrate: [100, 50, 100],
+      data: {
+        url: window.location.origin,
+      },
+      actions: [
+        {
+          action: "open",
+          title: "View App",
+        },
+        {
+          action: "close",
+          title: "Dismiss",
+        },
+      ],
+    });
+
+    return true;
   },
 
   urlB64ToUint8Array(base64String) {

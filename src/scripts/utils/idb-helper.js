@@ -139,9 +139,9 @@ const IdbHelper = {
       const db = await this.openDB();
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
-      
+
       const countRequest = store.count();
-      
+
       return new Promise((resolve, reject) => {
         countRequest.onsuccess = () => resolve(countRequest.result);
         countRequest.onerror = () => reject(countRequest.error);
@@ -150,7 +150,7 @@ const IdbHelper = {
       console.error("Error counting stories in IndexedDB:", error);
       return 0;
     }
-  }
+  },
 };
 
 export default IdbHelper;

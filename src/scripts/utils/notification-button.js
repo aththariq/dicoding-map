@@ -1,12 +1,12 @@
-import NotificationHelper from './notification-helper';
-import ApiService from '../data/api-service';
+import NotificationHelper from "./notification-helper";
+import ApiService from "../data/api-service";
 
 const NotificationButton = {
   async init({ container }) {
     this._container = container;
 
     if (!this._container) {
-      console.error('Notification button container not found');
+      console.error("Notification button container not found");
       return;
     }
 
@@ -16,81 +16,162 @@ const NotificationButton = {
 
   async _renderButton() {
     // Check if browser supports notifications
-    if (!('Notification' in window)) {
+    if (!NotificationHelper.isNotificationAvailable()) {
       this._container.innerHTML = `
-        <button class="notification-button" disabled>
-          <i class="fa-solid fa-bell-slash"></i> Notifications Not Supported
+        <button class="notification-button notification-button--prominent" disabled>
+          <i class="fa-solid fa-bell-slash"></i> <span>Notifications Not Supported</span>
+        </button>
+      `;
+      return;
+    }
+
+    // Check if service worker is available
+    if (!NotificationHelper.isServiceWorkerAvailable()) {
+      this._container.innerHTML = `
+        <button class="notification-button notification-button--prominent" disabled>
+          <i class="fa-solid fa-bell-slash"></i> <span>Service Workers Not Supported</span>
         </button>
       `;
       return;
     }
 
     // Check if already subscribed
-    const isSubscribed = await this._checkSubscriptionStatus();
-    
+    const isSubscribed = await NotificationHelper.hasActiveSubscription();
+
     this._container.innerHTML = `
-      <button id="notificationToggleBtn" class="notification-button ${isSubscribed ? 'subscribed' : ''}">
-        <i class="fa-solid ${isSubscribed ? 'fa-bell-slash' : 'fa-bell'}"></i>
-        ${isSubscribed ? 'Unsubscribe from Notifications' : 'Subscribe to Notifications'}
+      <button id="notificationToggleBtn" class="notification-button notification-button--prominent ${
+        isSubscribed ? "subscribed" : ""
+      }">
+        <i class="fa-solid ${isSubscribed ? "fa-bell-slash" : "fa-bell"}"></i>
+        <span>${
+          isSubscribed
+            ? "Unsubscribe from Notifications"
+            : "Subscribe to Notifications"
+        }</span>
       </button>
     `;
   },
 
-  async _checkSubscriptionStatus() {
-    try {
-      if (!('serviceWorker' in navigator)) return false;
-      
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (!registration) return false;
-      
-      const subscription = await registration.pushManager.getSubscription();
-      return !!subscription;
-    } catch (error) {
-      console.error('Error checking notification subscription status:', error);
-      return false;
-    }
-  },
-
   _setupEventListener() {
-    const button = document.getElementById('notificationToggleBtn');
+    const button = document.getElementById("notificationToggleBtn");
     if (!button) return;
 
-    button.addEventListener('click', async () => {
+    button.addEventListener("click", async () => {
       try {
         // First check if user is authenticated
         if (!ApiService.isAuthenticated()) {
-          alert('You need to login first to enable notifications');
-          window.location.hash = '#/login';
+          alert("You need to login first to enable notifications");
+          window.location.hash = "#/login";
           return;
         }
 
         button.disabled = true;
-        const isCurrentlySubscribed = button.classList.contains('subscribed');
+        button.classList.add("loading");
+        const isCurrentlySubscribed = button.classList.contains("subscribed");
 
         if (isCurrentlySubscribed) {
           // Unsubscribe
-          await NotificationHelper.unsubscribeFromPushNotification();
-          button.classList.remove('subscribed');
-          button.innerHTML = '<i class="fa-solid fa-bell"></i> Subscribe to Notifications';
+          const success =
+            await NotificationHelper.unsubscribeFromPushNotification();
+          if (success) {
+            button.classList.remove("subscribed");
+            button.innerHTML =
+              '<i class="fa-solid fa-bell"></i> <span>Subscribe to Notifications</span>';
+            this._showNotification(
+              "Unsubscribed successfully",
+              "You will no longer receive notifications"
+            );
+          } else {
+            this._showNotification(
+              "Failed to unsubscribe",
+              "Please try again later",
+              true
+            );
+          }
         } else {
           // Subscribe
-          const result = await NotificationHelper.subscribeToPushNotification();
-          
-          if (result) {
-            button.classList.add('subscribed');
-            button.innerHTML = '<i class="fa-solid fa-bell-slash"></i> Unsubscribe from Notifications';
-          } else {
-            alert('Failed to subscribe to notifications. Please check permissions and try again.');
+          try {
+            const subscription =
+              await NotificationHelper.subscribeToPushNotification();
+
+            if (subscription) {
+              button.classList.add("subscribed");
+              button.innerHTML =
+                '<i class="fa-solid fa-bell-slash"></i> <span>Unsubscribe from Notifications</span>';
+
+              // Show test notification to demonstrate it's working
+              setTimeout(() => {
+                NotificationHelper.showTestNotification();
+              }, 1000);
+
+              this._showNotification(
+                "Subscribed successfully",
+                "You will now receive notifications for new stories"
+              );
+            } else {
+              this._showNotification(
+                "Failed to subscribe",
+                "Please check permissions and try again",
+                true
+              );
+            }
+          } catch (error) {
+            console.error("Subscription error:", error);
+            if (error.message === "Notification permission denied") {
+              this._showNotification(
+                "Permission Denied",
+                "Please allow notifications in your browser settings",
+                true
+              );
+            } else {
+              this._showNotification(
+                "Subscription Failed",
+                error.message || "Please try again later",
+                true
+              );
+            }
           }
         }
       } catch (error) {
-        console.error('Error toggling notification subscription:', error);
-        alert('Error toggling notification subscription. Please try again.');
+        console.error("Error toggling notification subscription:", error);
+        this._showNotification(
+          "Error",
+          "Failed to toggle notification subscription. Please try again.",
+          true
+        );
       } finally {
         button.disabled = false;
+        button.classList.remove("loading");
       }
     });
-  }
+  },
+
+  _showNotification(title, message, isError = false) {
+    if (
+      NotificationHelper.isNotificationAvailable() &&
+      NotificationHelper.isNotificationGranted()
+    ) {
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification(title, {
+          body: message,
+          icon: "./src/public/favicon.svg",
+          badge: "./src/public/web-app-manifest-192x192.png",
+          vibrate: [100, 50, 100],
+        });
+      });
+    } else {
+      // Fallback to alert or custom toast notification
+      console.log(`${title}: ${message}`);
+      // If you have a toast component, use it here
+      const event = new CustomEvent("toast", {
+        detail: {
+          message: `${title}: ${message}`,
+          type: isError ? "error" : "success",
+        },
+      });
+      document.dispatchEvent(event);
+    }
+  },
 };
 
 export default NotificationButton;

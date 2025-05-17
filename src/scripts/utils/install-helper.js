@@ -31,6 +31,18 @@ const InstallHelper = {
       return;
     }
 
+    // Detect iOS
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS) {
+      // On iOS, we need to show our custom banner
+      setTimeout(() => {
+        if (this.shouldShowInstallBanner()) {
+          this.showIOSInstallBanner();
+        }
+      }, 3000);
+    }
+
     // Capture the beforeinstallprompt event
     window.addEventListener("beforeinstallprompt", (e) => {
       // Prevent default browser install prompt
@@ -48,22 +60,48 @@ const InstallHelper = {
     });
 
     // Hide install banner when app is installed
-    window.addEventListener("appinstalled", () => {
-      console.log("App was installed");
+    window.addEventListener("appinstalled", (event) => {
+      console.log("App was installed", event);
       this.hideInstallPromotion();
+      this.deferredPrompt = null;
+
+      // Save in localStorage that the app was installed
+      localStorage.setItem("appInstalled", "true");
+
+      // Show confirmation message
+      const event2 = new CustomEvent("toast", {
+        detail: {
+          message: "Dicoding Story was successfully installed!",
+          type: "success",
+        },
+      });
+      document.dispatchEvent(event2);
     });
 
-    // For testing purposes - show banner after a short delay
-    // This helps us confirm the UI is working correctly
-    setTimeout(() => {
-      if (
-        !this.deferredPrompt &&
-        !window.matchMedia("(display-mode: standalone)").matches
-      ) {
-        console.log("Showing test banner after timeout");
-        this.showInstallPromotion(true);
-      }
-    }, 5000);
+    // Check query parameters for auto-display of install banner
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("install") === "true") {
+      setTimeout(() => {
+        if (this.deferredPrompt) {
+          this.showInstallPromotion();
+        } else {
+          console.log("Install prompt not yet available");
+        }
+      }, 3000);
+    } else {
+      // For testing purposes - show banner after a short delay
+      // This helps us confirm the UI is working correctly
+      setTimeout(() => {
+        if (
+          !this.deferredPrompt &&
+          !window.matchMedia("(display-mode: standalone)").matches &&
+          !localStorage.getItem("appInstalled")
+        ) {
+          console.log("Showing test banner after timeout");
+          this.showInstallPromotion(true);
+        }
+      }, 5000);
+    }
   },
 
   // Create and show a custom installation banner
@@ -109,6 +147,10 @@ const InstallHelper = {
             <i class="fa-solid fa-bell"></i>
             <span>Get notifications</span>
           </div>
+          <div class="install-banner__feature">
+            <i class="fa-solid fa-mobile-screen"></i>
+            <span>Home screen access</span>
+          </div>
         </div>
         
         <button class="install-banner__button">
@@ -152,12 +194,37 @@ const InstallHelper = {
   hideInstallPromotion() {
     if (!this.installContainer) return;
     this.installContainer.classList.remove("active");
+
+    // Optional: Also hide with animation
+    const banner = this.installContainer.querySelector(".install-banner");
+    if (banner) {
+      banner.classList.add("hiding");
+      setTimeout(() => {
+        this.installContainer.innerHTML = "";
+      }, 300);
+    }
   },
 
   // Trigger the installation flow
   async installApp() {
     if (!this.deferredPrompt) {
       console.log("No installation prompt available");
+
+      // Show platform-specific installation instructions
+      if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
+        alert(
+          "To install this app on iOS: tap the share icon and then select 'Add to Home Screen'"
+        );
+      } else if (/android/i.test(navigator.userAgent)) {
+        alert(
+          "To install this app on Android, tap on the menu button (⋮) in your browser and select 'Install app' or 'Add to Home Screen'"
+        );
+      } else {
+        alert(
+          "To install this app, click the install icon in your browser's address bar or menu options"
+        );
+      }
+
       return;
     }
 
@@ -173,6 +240,20 @@ const InstallHelper = {
 
     // Hide our custom install UI
     this.hideInstallPromotion();
+
+    // Report outcome
+    if (outcome === "accepted") {
+      console.log("User accepted the install prompt");
+      const event = new CustomEvent("toast", {
+        detail: {
+          message: "Installing Dicoding Story...",
+          type: "info",
+        },
+      });
+      document.dispatchEvent(event);
+    } else {
+      console.log("User dismissed the install prompt");
+    }
   },
 
   // Check if banner should be shown (not recently dismissed)
