@@ -1,6 +1,5 @@
 /* Install Banner Styles */
 .install-banner-container {
-  display: none;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -12,10 +11,11 @@
   border-top: 3px solid #3a59d1;
   transform: translateY(100%);
   transition: transform 0.3s ease-in-out;
+  visibility: hidden;
 }
 
 .install-banner-container.active {
-  display: block;
+  visibility: visible;
   transform: translateY(0);
 }
 

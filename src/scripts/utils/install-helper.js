@@ -9,6 +9,7 @@ const InstallHelper = {
   deferredPrompt: null,
   installContainer: null,
   installButton: null,
+  isDebugMode: false, // Set to true for testing installation flow
 
   init({ installContainer }) {
     this.installContainer = installContainer;
@@ -42,6 +43,9 @@ const InstallHelper = {
         }
       }, 3000);
     }
+
+    // Setup event handlers in advance
+    this.setupEventHandlers();
 
     // Capture the beforeinstallprompt event
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -115,26 +119,30 @@ const InstallHelper = {
 
     // Add active class to show the banner with animation
     this.installContainer.classList.add("active");
+  },
 
-    // Setup event handlers
+  // Setup event handlers for the banner
+  setupEventHandlers() {
     this.installButton = document.getElementById("installButton");
     const closeButton = document.getElementById("closeInstallBanner");
 
     if (this.installButton) {
       this.installButton.addEventListener("click", () => {
-        if (isTest && !this.deferredPrompt) {
-          alert(
-            "This is a test banner. In a real scenario, the app installation would start now."
-          );
-          this.hideInstallPromotion();
-          return;
+        if (
+          (!this.deferredPrompt && !this.isDebugMode) ||
+          (this.isDebugMode &&
+            !window.matchMedia("(display-mode: standalone)").matches)
+        ) {
+          // If we're testing and there's no prompt
+          console.log("Install button clicked - starting installation");
+          this.installApp();
         }
-        this.installApp();
       });
     }
 
     if (closeButton) {
       closeButton.addEventListener("click", () => {
+        console.log("Close install banner clicked");
         this.hideInstallPromotion();
 
         // Store that user dismissed the prompt
@@ -163,6 +171,20 @@ const InstallHelper = {
     if (!this.deferredPrompt) {
       console.log("No installation prompt available");
 
+      // For debug purposes
+      if (this.isDebugMode) {
+        console.log("Debug mode: simulating successful install");
+        this.hideInstallPromotion();
+        const event = new CustomEvent("toast", {
+          detail: {
+            message: "Test install successful!",
+            type: "success",
+          },
+        });
+        document.dispatchEvent(event);
+        return;
+      }
+
       // Show platform-specific installation instructions
       if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
         alert(
@@ -181,31 +203,38 @@ const InstallHelper = {
       return;
     }
 
-    // Show the browser install prompt
-    this.deferredPrompt.prompt();
+    try {
+      console.log("Calling prompt() on the beforeinstallprompt event");
 
-    // Wait for user to respond
-    const { outcome } = await this.deferredPrompt.userChoice;
-    console.log(`User response: ${outcome}`);
+      // Show the browser install prompt
+      this.deferredPrompt.prompt();
 
-    // Reset the deferred prompt
-    this.deferredPrompt = null;
+      // Wait for user to respond
+      const { outcome } = await this.deferredPrompt.userChoice;
+      console.log(`User response to install prompt: ${outcome}`);
 
-    // Hide our custom install UI
-    this.hideInstallPromotion();
+      // Reset the deferred prompt
+      this.deferredPrompt = null;
 
-    // Report outcome
-    if (outcome === "accepted") {
-      console.log("User accepted the install prompt");
-      const event = new CustomEvent("toast", {
-        detail: {
-          message: "Installing Dicoding Story...",
-          type: "info",
-        },
-      });
-      document.dispatchEvent(event);
-    } else {
-      console.log("User dismissed the install prompt");
+      // Hide our custom install UI
+      this.hideInstallPromotion();
+
+      // Report outcome
+      if (outcome === "accepted") {
+        console.log("User accepted the install prompt");
+        const event = new CustomEvent("toast", {
+          detail: {
+            message: "Installing Dicoding Story...",
+            type: "info",
+          },
+        });
+        document.dispatchEvent(event);
+      } else {
+        console.log("User dismissed the install prompt");
+      }
+    } catch (error) {
+      console.error("Error during app installation:", error);
+      alert("There was an error installing the app. Please try again later.");
     }
   },
 

@@ -36,3 +36,13 @@
   for = "/*.ico"
   [headers.values]
     Content-Type = "image/x-icon"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Content-Type = "image/jpeg"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "geolocation=self, camera=self, microphone=self"
