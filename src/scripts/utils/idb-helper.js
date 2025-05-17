@@ -32,54 +32,125 @@ const IdbHelper = {
   },
 
   async saveStories(stories) {
-    const db = await this.openDB();
-    const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
-    const store = tx.objectStore(this.OBJECT_STORE_NAME);
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-    // Clear existing stories
-    await store.clear();
+      // Clear existing stories
+      await store.clear();
 
-    // Add all stories
-    stories.forEach((story) => {
-      store.add(story);
-    });
+      // Add all stories
+      stories.forEach((story) => {
+        store.add(story);
+      });
 
-    return tx.complete;
+      return tx.complete;
+    } catch (error) {
+      console.error("Error saving stories to IndexedDB:", error);
+      return false;
+    }
   },
 
   async getFavoriteStories() {
-    const db = await this.openDB();
-    const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
-    const store = tx.objectStore(this.OBJECT_STORE_NAME);
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-    return store.getAll();
+      return store.getAll();
+    } catch (error) {
+      console.error("Error getting stories from IndexedDB:", error);
+      return [];
+    }
   },
 
   async getStory(id) {
-    const db = await this.openDB();
-    const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
-    const store = tx.objectStore(this.OBJECT_STORE_NAME);
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-    return store.get(id);
+      return store.get(id);
+    } catch (error) {
+      console.error(`Error getting story ${id} from IndexedDB:`, error);
+      return null;
+    }
   },
 
   async saveStory(story) {
-    const db = await this.openDB();
-    const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
-    const store = tx.objectStore(this.OBJECT_STORE_NAME);
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-    store.put(story);
-    return tx.complete;
+      store.put(story);
+      return tx.complete;
+    } catch (error) {
+      console.error("Error saving story to IndexedDB:", error);
+      return false;
+    }
   },
 
   async deleteStory(id) {
-    const db = await this.openDB();
-    const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
-    const store = tx.objectStore(this.OBJECT_STORE_NAME);
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-    store.delete(id);
-    return tx.complete;
+      store.delete(id);
+      return tx.complete;
+    } catch (error) {
+      console.error(`Error deleting story ${id} from IndexedDB:`, error);
+      return false;
+    }
   },
+
+  // New methods to better manage data
+  async getAllStories() {
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
+
+      return store.getAll();
+    } catch (error) {
+      console.error("Error getting all stories from IndexedDB:", error);
+      return [];
+    }
+  },
+
+  async clearAllStories() {
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
+
+      await store.clear();
+      return true;
+    } catch (error) {
+      console.error("Error clearing IndexedDB stories:", error);
+      return false;
+    }
+  },
+
+  async getStoriesCount() {
+    try {
+      const db = await this.openDB();
+      const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
+      const store = tx.objectStore(this.OBJECT_STORE_NAME);
+      
+      const countRequest = store.count();
+      
+      return new Promise((resolve, reject) => {
+        countRequest.onsuccess = () => resolve(countRequest.result);
+        countRequest.onerror = () => reject(countRequest.error);
+      });
+    } catch (error) {
+      console.error("Error counting stories in IndexedDB:", error);
+      return 0;
+    }
+  }
 };
 
 export default IdbHelper;

@@ -54,12 +54,11 @@
     <!-- CSS Files - explicit type to avoid MIME type issues -->
     <link rel="stylesheet" href="./src/styles/styles.css" type="text/css" />
     <link rel="stylesheet" href="./src/styles/main.css" type="text/css" />
+    <link rel="stylesheet" href="./src/styles/notification.css" type="text/css" />
+    <link rel="stylesheet" href="./src/styles/data-manager.css" type="text/css" />
 
     <!-- App manifest -->
-    <link rel="manifest" href="./manifest.json" crossorigin="use-credentials" />
-
-    <!-- Site webmanifest for browsers that don't support manifest.json -->
-    <link rel="manifest" href="./src/public/site.webmanifest" />
+    <link rel="manifest" href="./manifest.json" />
 
     <!-- Google Fonts -->
     <link
@@ -82,6 +81,7 @@
       <div class="app-bar__brand">
         <h1><i class="fa-solid fa-book-open"></i> Dicoding Story</h1>
       </div>
+      <div id="notificationButton" class="app-bar__notification"></div>
       <nav id="navigationDrawer" class="app-bar__navigation">
         <ul>
           <li>

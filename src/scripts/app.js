@@ -1,4 +1,4 @@
-import { DrawerInitiator, AuthHelper, InstallHelper } from "./utils";
+import { DrawerInitiator, AuthHelper, InstallHelper, NotificationButton } from "./utils";
 import { getActiveRoute } from "./routes/url-parser";
 import routes from "./routes/routes";
 
@@ -23,6 +23,14 @@ class App {
     InstallHelper.init({
       installContainer: document.getElementById("installBanner"),
     });
+
+    // Initialize notification button
+    const notificationButtonContainer = document.getElementById("notificationButton");
+    if (notificationButtonContainer) {
+      NotificationButton.init({
+        container: notificationButtonContainer,
+      });
+    }
 
     // Set current year in footer
     document.getElementById("year").textContent = new Date().getFullYear();

@@ -3,9 +3,12 @@
   "short_name": "DStory",
   "description": "Share your stories with Dicoding community",
   "start_url": "./index.html",
+  "id": "./index.html",
   "display": "standalone",
   "background_color": "#FFFFFF",
   "theme_color": "#3A59D1",
+  "categories": ["social", "productivity", "photo"],
+  "orientation": "any",
   "icons": [
     {
       "src": "./src/public/web-app-manifest-192x192.png",

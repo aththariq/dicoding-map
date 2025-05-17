@@ -1,0 +1,76 @@
+/* filepath: /Users/attarlisan/Documents/CODE/ProyekPertama/src/styles/data-manager.css */
+/* Data Manager Styles */
+.data-manager {
+  background-color: var(--white-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.data-manager__header {
+  margin-bottom: 16px;
+}
+
+.data-manager__header h3 {
+  color: var(--primary-color);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.data-manager__header h3 i {
+  margin-right: 8px;
+}
+
+.data-manager__stats {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.data-manager__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Toast Notifications */
+.toast {
+  position: fixed;
+  bottom: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--white-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  z-index: 9999;
+  transition: all 0.3s ease;
+}
+
+.toast.show {
+  bottom: 24px;
+}
+
+.toast__content {
+  display: flex;
+  align-items: center;
+}
+
+.toast__content i {
+  margin-right: 12px;
+}
+
+.toast-success i {
+  color: var(--success-color);
+}
+
+.toast-error i {
+  color: var(--error-color);
+}
+
+@media screen and (max-width: 480px) {
+  .data-manager__actions {
+    flex-direction: column;
+  }
+}

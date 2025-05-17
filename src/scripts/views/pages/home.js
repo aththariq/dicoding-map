@@ -1,4 +1,4 @@
-import { showFormattedDate } from "../../utils";
+import { showFormattedDate, DataManager } from "../../utils";
 import StoryModel from "../../models/StoryModel";
 import UserModel from "../../models/UserModel";
 import HomePresenter from "../../presenters/HomePresenter";
@@ -30,6 +30,8 @@ class HomePage {
     return `
       <section class="home-container">
         <h2 class="page-title"><i class="fa-solid fa-book-open"></i> Story Feed</h2>
+        
+        <div id="dataManager"></div>
         
         <div class="tab-container">
           <button class="tab-button active" id="allStoriesTab">
@@ -76,6 +78,11 @@ class HomePage {
     // Setup tabs
     this._setupTabs();
 
+    // Initialize data manager
+    DataManager.init({
+      container: document.getElementById('dataManager'),
+    });
+
     try {
       await this._initializeMap();
       await this.onLoadStories({ withLocation: true });
@@ -84,6 +91,11 @@ class HomePage {
       this._updateNetworkStatus();
       window.addEventListener("online", () => this._updateNetworkStatus());
       window.addEventListener("offline", () => this._updateNetworkStatus());
+      
+      // Setup data refresh event listener
+      document.addEventListener('refresh-stories', () => {
+        this.onLoadStories({ withLocation: true });
+      });
     } catch (error) {
       console.error("Error initializing home page:", error);
       this.renderError("Failed to load stories. Please try again later.");

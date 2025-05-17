@@ -12,7 +12,7 @@ const { strategies, routing, precaching, expiration, cacheableResponse } =
   workbox;
 
 // Cache name
-const CACHE_NAME = "dicoding-story-v2";
+const CACHE_NAME = "dicoding-story-v3";
 
 // Precached assets - critical for App Shell
 const appShellFiles = [
@@ -23,6 +23,8 @@ const appShellFiles = [
   "./src/scripts/index.js",
   "./src/styles/main.css",
   "./src/styles/styles.css",
+  "./src/styles/notification.css",
+  "./src/styles/data-manager.css",
   "./src/public/favicon.svg",
   "./src/public/favicon.ico",
   "./src/public/favicon-96x96.png",
@@ -162,6 +164,11 @@ self.addEventListener("push", (event) => {
       options: {
         body: "New update available",
         icon: "./src/public/favicon.svg",
+        badge: "./src/public/web-app-manifest-192x192.png",
+        vibrate: [100, 50, 100],
+        data: {
+          url: self.location.origin
+        }
       },
     };
   }
@@ -175,18 +182,20 @@ self.addEventListener("push", (event) => {
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
 
+  const urlToOpen = event.notification.data?.url || '/';
+
   event.waitUntil(
     clients.matchAll({ type: "window" }).then((clientList) => {
       // If a window client is already open, focus it
       for (const client of clientList) {
-        if (client.url.includes("/") && "focus" in client) {
+        if (client.url.includes(urlToOpen) && "focus" in client) {
           return client.focus();
         }
       }
 
       // Otherwise open a new window
       if (clients.openWindow) {
-        return clients.openWindow("/");
+        return clients.openWindow(urlToOpen);
       }
 
       return null;
