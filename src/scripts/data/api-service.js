@@ -117,7 +117,7 @@ class ApiService {
     return await response.json();
   }
 
-  static async unsubscribeFromPushNotification(endpoint) {
+  static async unsubscribeFromPushNotification({ endpoint }) {
     const token = localStorage.getItem(CONFIG.TOKEN_KEY);
     const response = await fetch(API.NOTIFICATION_SUBSCRIBE, {
       method: "DELETE",

@@ -174,8 +174,8 @@ const NotificationHelper = {
 
     serviceWorkerRegistration.showNotification("Test Notification", {
       body: "This is a test notification from Dicoding Story",
-      icon: "./src/public/favicon.svg",
-      badge: "./src/public/web-app-manifest-192x192.png",
+      icon: "/favicon.svg",
+      badge: "/web-app-manifest-192x192.png",
       vibrate: [100, 50, 100],
       data: {
         url: window.location.origin,

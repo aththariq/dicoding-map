@@ -11,19 +11,19 @@
   "orientation": "any",
   "icons": [
     {
-      "src": "./src/public/logoipsum-144x144.png",
+      "src": "/logoipsum-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./src/public/web-app-manifest-192x192.png",
+      "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "./src/public/web-app-manifest-512x512.png",
+      "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -37,7 +37,7 @@
       "url": "./index.html#/add-story",
       "icons": [
         {
-          "src": "./src/public/web-app-manifest-192x192.png",
+          "src": "/web-app-manifest-192x192.png",
           "sizes": "192x192"
         }
       ]
@@ -49,7 +49,7 @@
       "url": "./index.html#/home",
       "icons": [
         {
-          "src": "./src/public/web-app-manifest-192x192.png",
+          "src": "/web-app-manifest-192x192.png",
           "sizes": "192x192"
         }
       ]
@@ -57,14 +57,14 @@
   ],
   "screenshots": [
     {
-      "src": "./src/public/screenshot-1.png",
+      "src": "/screenshot-1.png",
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
       "label": "Homescreen of Dicoding Story App"
     },
     {
-      "src": "./src/public/screenshot-2.png",
+      "src": "/screenshot-2.png",
       "sizes": "414x896",
       "type": "image/png",
       "form_factor": "narrow",
