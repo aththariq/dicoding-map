@@ -37,15 +37,29 @@ const IdbHelper = {
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-      // Clear existing stories
-      await store.clear();
-
-      // Add all stories
-      stories.forEach((story) => {
-        store.add(story);
+      // Clear existing stories first
+      await new Promise((resolve, reject) => {
+        const clearRequest = store.clear();
+        clearRequest.onsuccess = () => resolve();
+        clearRequest.onerror = (event) => reject(event.target.error);
       });
 
-      return tx.complete;
+      // Add all stories one by one
+      for (const story of stories) {
+        await new Promise((resolve, reject) => {
+          const addRequest = store.add(story);
+          addRequest.onsuccess = () => resolve();
+          addRequest.onerror = (event) => {
+            console.error(
+              "Error adding story to IndexedDB:",
+              event.target.error
+            );
+            reject(event.target.error);
+          };
+        });
+      }
+
+      return true;
     } catch (error) {
       console.error("Error saving stories to IndexedDB:", error);
       return false;
@@ -58,7 +72,21 @@ const IdbHelper = {
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-      return store.getAll();
+      return new Promise((resolve, reject) => {
+        const request = store.getAll();
+
+        request.onsuccess = (event) => {
+          resolve(event.target.result || []);
+        };
+
+        request.onerror = (event) => {
+          console.error(
+            "Error getting stories from IndexedDB:",
+            event.target.error
+          );
+          reject(event.target.error);
+        };
+      });
     } catch (error) {
       console.error("Error getting stories from IndexedDB:", error);
       return [];
@@ -71,7 +99,21 @@ const IdbHelper = {
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-      return store.get(id);
+      return new Promise((resolve, reject) => {
+        const request = store.get(id);
+
+        request.onsuccess = (event) => {
+          resolve(event.target.result);
+        };
+
+        request.onerror = (event) => {
+          console.error(
+            `Error getting story ${id} from IndexedDB:`,
+            event.target.error
+          );
+          reject(event.target.error);
+        };
+      });
     } catch (error) {
       console.error(`Error getting story ${id} from IndexedDB:`, error);
       return null;
@@ -84,8 +126,30 @@ const IdbHelper = {
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-      store.put(story);
-      return tx.complete;
+      return new Promise((resolve, reject) => {
+        const request = store.put(story);
+
+        request.onsuccess = () => {
+          resolve(true);
+        };
+
+        request.onerror = (event) => {
+          console.error("Error saving story to IndexedDB:", event.target.error);
+          reject(event.target.error);
+        };
+
+        tx.oncomplete = () => {
+          resolve(true);
+        };
+
+        tx.onerror = (event) => {
+          console.error(
+            "Transaction error when saving story:",
+            event.target.error
+          );
+          reject(event.target.error);
+        };
+      });
     } catch (error) {
       console.error("Error saving story to IndexedDB:", error);
       return false;
@@ -98,8 +162,33 @@ const IdbHelper = {
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-      store.delete(id);
-      return tx.complete;
+      return new Promise((resolve, reject) => {
+        const request = store.delete(id);
+
+        request.onsuccess = () => {
+          resolve(true);
+        };
+
+        request.onerror = (event) => {
+          console.error(
+            `Error deleting story ${id} from IndexedDB:`,
+            event.target.error
+          );
+          reject(event.target.error);
+        };
+
+        tx.oncomplete = () => {
+          resolve(true);
+        };
+
+        tx.onerror = (event) => {
+          console.error(
+            "Transaction error when deleting story:",
+            event.target.error
+          );
+          reject(event.target.error);
+        };
+      });
     } catch (error) {
       console.error(`Error deleting story ${id} from IndexedDB:`, error);
       return false;
@@ -113,7 +202,21 @@ const IdbHelper = {
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readonly");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-      return store.getAll();
+      return new Promise((resolve, reject) => {
+        const request = store.getAll();
+
+        request.onsuccess = (event) => {
+          resolve(event.target.result || []);
+        };
+
+        request.onerror = (event) => {
+          console.error(
+            "Error getting all stories from IndexedDB:",
+            event.target.error
+          );
+          reject(event.target.error);
+        };
+      });
     } catch (error) {
       console.error("Error getting all stories from IndexedDB:", error);
       return [];
@@ -126,8 +229,21 @@ const IdbHelper = {
       const tx = db.transaction(this.OBJECT_STORE_NAME, "readwrite");
       const store = tx.objectStore(this.OBJECT_STORE_NAME);
 
-      await store.clear();
-      return true;
+      return new Promise((resolve, reject) => {
+        const request = store.clear();
+
+        request.onsuccess = () => {
+          resolve(true);
+        };
+
+        request.onerror = (event) => {
+          console.error(
+            "Error clearing IndexedDB stories:",
+            event.target.error
+          );
+          reject(event.target.error);
+        };
+      });
     } catch (error) {
       console.error("Error clearing IndexedDB stories:", error);
       return false;
