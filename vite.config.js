@@ -4,7 +4,7 @@ import fs from "fs";
 
 export default defineConfig({
   root: "./",
-  publicDir: "public",
+  publicDir: "src/public",
   build: {
     outDir: "dist",
     emptyOutDir: true,
@@ -39,10 +39,10 @@ export default defineConfig({
       },
     ],
   },
-  // Copy service worker and manifest to dist folder during production build
+  // Copy service worker to dist folder during production build
   plugins: [
     {
-      name: "copy-sw-manifest",
+      name: "copy-sw",
       apply: "build",
       generateBundle() {
         // Emit service worker file
@@ -51,26 +51,6 @@ export default defineConfig({
           fileName: "sw.js",
           source: fs.readFileSync("./sw.js", "utf-8"),
         });
-
-        // Emit manifest with proper JSON formatting
-        const manifestContent = fs.readFileSync("./manifest.json", "utf-8");
-        try {
-          // Parse and stringify to ensure valid JSON
-          const manifestJson = JSON.parse(manifestContent);
-          this.emitFile({
-            type: "asset",
-            fileName: "manifest.json",
-            source: JSON.stringify(manifestJson, null, 2),
-          });
-        } catch (e) {
-          console.error("Error parsing manifest.json:", e);
-          // Fallback to original content
-          this.emitFile({
-            type: "asset",
-            fileName: "manifest.json",
-            source: manifestContent,
-          });
-        }
       },
     },
   ],
