@@ -1,18 +1,19 @@
 // Service Worker with Workbox
-importScripts(
-  "https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js"
-);
+try {
+  importScripts(
+    "https://storage.googleapis.com/workbox-cdn/releases/6.5.4/workbox-sw.js"
+  );
 
-// Workbox configuration
-workbox.setConfig({
-  debug: false,
-});
+  // Workbox configuration
+  workbox.setConfig({
+    debug: false,
+  });
 
-const { strategies, routing, precaching, expiration, cacheableResponse } =
-  workbox;
+  const { strategies, routing, precaching, expiration, cacheableResponse } =
+    workbox;
 
-// Cache name
-const CACHE_NAME = "dicoding-story-v3";
+  // Cache name
+  const CACHE_NAME = "dicoding-story-v4";
 
 // Precached assets - critical for App Shell
 const appShellFiles = [
@@ -59,6 +60,9 @@ routing.registerRoute(
   new strategies.StaleWhileRevalidate({
     cacheName: "assets-cache",
     plugins: [
+      new cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
       new expiration.ExpirationPlugin({
         maxEntries: 60,
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
@@ -129,6 +133,23 @@ routing.registerRoute(
       }),
     ],
     networkTimeoutSeconds: 3, // Fallback to cache after 3 seconds if network is slow
+  })
+);
+
+// Cache JSON files for configs and manifests
+routing.registerRoute(
+  ({ request }) => request.destination === 'manifest' || request.url.includes('.json'),
+  new strategies.StaleWhileRevalidate({
+    cacheName: "json-cache",
+    plugins: [
+      new cacheableResponse.CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new expiration.ExpirationPlugin({
+        maxEntries: 20,
+        maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+      }),
+    ],
   })
 );
 

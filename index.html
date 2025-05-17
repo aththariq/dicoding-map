@@ -139,7 +139,22 @@
       <p>&copy; <span id="year"></span> Dicoding Story</p>
     </footer>
 
+    <!-- Check for module support -->
+    <script>
+      // Check if browser supports modules
+      if (!("noModule" in HTMLScriptElement.prototype)) {
+        // Browser doesn't support modules, add a notice
+        console.warn(
+          "Your browser does not support JavaScript modules. Some features may not work correctly."
+        );
+      }
+    </script>
+
     <!-- App Bundle -->
-    <script src="./src/scripts/index.js" type="module"></script>
+    <script
+      src="./src/scripts/index.js"
+      type="module"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

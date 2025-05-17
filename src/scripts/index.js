@@ -4,15 +4,16 @@ import ToastInitiator from "./utils/toast-initiator";
 
 // Register Service Worker
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/sw.js")
-      .then((registration) => {
-        console.log("Service Worker registered successfully:", registration);
-      })
-      .catch((error) => {
-        console.log("Service Worker registration failed:", error);
+  window.addEventListener("load", async () => {
+    try {
+      const registration = await navigator.serviceWorker.register("/sw.js", {
+        scope: "/",
+        updateViaCache: "none", // Prevent the browser from using cached versions of the SW
       });
+      console.log("Service Worker registered successfully:", registration);
+    } catch (error) {
+      console.error("Service Worker registration failed:", error);
+    }
   });
 }
 
